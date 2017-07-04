@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Domain tool</title>
+  <meta name="author" content="dnlo">
+  <meta name="description" content="default description">
+  <meta name="keywords" content="tag1,tag2,tag3">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/css/tachyons.css">
+<style>
+  *{ margin: 0; padding: 0; }
+</style>
+</head>
+<body>
+  <main class="pa0 ma2">
+    <h2 class="f2 mb2">proveri dostupnost domena</h2>
+    <input id="input" type=text>
+    <button id="go" onclick='getValue()'>proveri</button>
+    <p id="statusMessage" class="f4"></p>
+  </main>
+<script>
+  var httpRequest;
+  var inputValue;
+  var statusMessage = document.getElementById("statusMessage");
+
+  document.getElementById("go").addEventListener('click', makeRequest);
+
+  function getValue() {
+    inputValue = document.getElementById("input").value
+    console.log(inputValue)
+  }
+
+  function makeRequest() {
+    httpRequest = new XMLHttpRequest();
+
+    if (!httpRequest) {
+      alert('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest.onreadystatechange = alertContents;
+
+    httpRequest.open('GET', 'https://domainr.p.mashape.com/v2/status?mashape-key=&domain='+encodeURIComponent(inputValue))
+    httpRequest.setRequestHeader("X-Mashape-Key", "Qgzp8QxOPUmsh4xVtUL85VsRT51Vp1GUGJ5jsnEPl40TCrKDnl");
+    httpRequest.send();
+  }
+
+  function alertContents() {
+    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest.status === 200) {
+        parse = JSON.parse(httpRequest.responseText)
+        status = parse.status[0]["summary"]
+        if (status != "active") {
+          statusMessage.innerHTML = "slobodan";
+          statusMessage.classList.add("green");
+        } else {
+          statusMessage.innerHTML = "zauzet";
+          statusMessage.classList.add("red");
+          }
+      } else {
+        alert('There was a problem with the request.');
+      }
+    }
+  }
+</script>
+</body>
+</html>
